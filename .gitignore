@@ -1,0 +1,4 @@
+# Ignorar el entorno virtual (puede variar según el nombre de la carpeta)
+venv/
+.env/
+env/

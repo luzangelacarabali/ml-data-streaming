@@ -1,0 +1,29 @@
+# Jupyter & manejo general
+jupyter
+ipykernel
+notebook
+pandas
+numpy
+
+# Visualización
+matplotlib
+seaborn
+
+# Machine Learning
+scikit-learn
+joblib
+
+# Kafka
+kafka-python
+
+# PostgreSQL
+psycopg2-binary
+
+# Serialización y manipulación
+pickle-mixin
+
+# Variables de entorno
+python-dotenv
+
+# Otros útiles
+tqdm
