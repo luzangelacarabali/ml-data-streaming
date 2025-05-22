@@ -1,6 +1,4 @@
-Claro, aquí tienes un ejemplo de README para tu taller, que explica claramente el proyecto, su estructura, y cómo usarlo. Lo puedes copiar y adaptar si quieres:
 
----
 
 # Predicción del Happiness Score por País (2015-2019)
 
@@ -126,8 +124,3 @@ pip install -r requirements.txt
 
 ## Contacto
 
-Si tienes dudas o quieres contribuir, puedes abrir un issue o contactarme.
-
----
-
-¿Quieres que te prepare también un ejemplo para el archivo `requirements.txt` o un script para inicializar la base de datos?
