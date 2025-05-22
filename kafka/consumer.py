@@ -1,10 +1,10 @@
 import os
 import json
-import pickle
 import pandas as pd
 from kafka import KafkaConsumer
 from dotenv import load_dotenv
 import psycopg2
+from joblib import load
 
 # Cargar variables de entorno
 load_dotenv()
@@ -18,9 +18,8 @@ DB_NAME = os.getenv("DB_NAME")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 
-# Consulta para crear la tabla si no existe (todo en minúsculas)
 create_table_query = """
-CREATE TABLE IF NOT EXISTS predictions (
+CREATE TABLE IF NOT EXISTS Estimates (
     region TEXT,
     happiness_score DOUBLE PRECISION,
     gdp_per_capita DOUBLE PRECISION,
@@ -50,25 +49,24 @@ try:
         cursor.execute(create_table_query)
         conn.commit()
 
-    # Cargar modelo entrenado
-    with open(r'C:\Users\Acer\OneDrive\Escritorio\Workshops y Proyectos\workshop3\modelo\mejor_modelo.pkl', 'rb') as f:
-        modelo = pickle.load(f)
+    # Cargar modelo entrenado con joblib
+    modelo = load(r'C:\Users\Acer\OneDrive\Escritorio\Workshops y Proyectos\workshop3\modelo\ranf_model_model.pkl')
 
     # Obtener features esperadas por el modelo
     try:
         features = list(modelo.feature_names_in_)
     except AttributeError:
+        # Si no está definido, poner las features manualmente (ajustar según tu modelo)
         features = [
-            'GDP_per_Capita', 'Social_Support', 'Life_Expectancy', 'Cluster',
-            'Happiness_Level_Bajo', 'GDP_per_Capita Generosity',
-            'GDP_per_Capita Cluster', 'GDP_per_Capita Happiness_Level_Bajo',
-            'Social_Support Generosity', 'Life_Expectancy Generosity',
-            'Life_Expectancy Cluster', 'Generosity Cluster',
-            'Generosity Happiness_Level_Bajo', 'Region_Sub-Saharan Africa^2',
-            'Happiness_Level_Bajo^2'
+            'GDP_per_Capita', 'Social_Support', 'Life_Expectancy', 'Freedom',
+            'Corruption_Perception', 'Generosity', 'Cluster',
+            'Region_Central and Eastern Europe', 'Region_Eastern Asia',
+            'Region_Latin America and Caribbean', 'Region_Middle East and Northern Africa',
+            'Region_North America', 'Region_Southeastern Asia', 'Region_Southern Asia',
+            'Region_Sub-Saharan Africa', 'Region_Unknown', 'Region_Western Europe',
+            'Happiness_Level_Bajo', 'Happiness_Level_Medio'
         ]
 
-    # Inicializar Kafka Consumer
     consumer = KafkaConsumer(
         KAFKA_TOPIC,
         bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS.split(','),
@@ -85,7 +83,6 @@ try:
                 print("⚠️ Mensaje vacío recibido, ignorando.")
                 continue
 
-            # Validar campos obligatorios
             required_fields = ['Region', 'Happiness_Score', 'GDP_per_Capita']
             if not all(field in data for field in required_fields):
                 print(f"⚠️ Datos incompletos recibidos: {data}")
@@ -94,59 +91,42 @@ try:
             print("📥 Recibido:", data)
             df = pd.DataFrame([data])
 
-            # Evitar SettingWithCopyWarning usando .loc y asegurarse que todas las columnas existan antes
-            # Crear columnas dummy y transformaciones que espera el modelo
-            if 'Happiness_Level_Bajo' in features:
-                df.loc[:, 'Happiness_Level_Bajo'] = (df['Happiness_Level'] == 'Bajo').astype(int)
-            if 'Region_Sub-Saharan Africa^2' in features:
-                df.loc[:, 'Region_Sub-Saharan Africa^2'] = ((df['Region'] == 'Sub-Saharan Africa').astype(int)) ** 2
-            if 'Happiness_Level_Bajo^2' in features:
-                if 'Happiness_Level_Bajo' in df.columns:
-                    df.loc[:, 'Happiness_Level_Bajo^2'] = df['Happiness_Level_Bajo'] ** 2
-                else:
-                    df.loc[:, 'Happiness_Level_Bajo^2'] = 0
+            # Crear dummies para Region
+            region_cols = [col for col in features if col.startswith('Region_')]
+            for col in region_cols:
+                region_name = col.replace('Region_', '')
+                df[col] = (df['Region'] == region_name).astype(int)
 
-            # Interacciones
-            interaction_features = [
-                'GDP_per_Capita Generosity',
-                'GDP_per_Capita Cluster',
-                'GDP_per_Capita Happiness_Level_Bajo',
-                'Social_Support Generosity',
-                'Life_Expectancy Generosity',
-                'Life_Expectancy Cluster',
-                'Generosity Cluster',
-                'Generosity Happiness_Level_Bajo'
-            ]
+            # Crear dummies para Happiness_Level (Bajo, Medio)
+            happiness_level_cols = [col for col in features if col.startswith('Happiness_Level_')]
+            for col in happiness_level_cols:
+                level_name = col.replace('Happiness_Level_', '')
+                df[col] = (df['Happiness_Level'] == level_name).astype(int)
 
-            for feat in interaction_features:
-                if feat in features:
-                    cols = feat.split()
-                    if len(cols) == 2:
-                        col1, col2 = cols
-                        if col1 in df.columns and col2 in df.columns:
-                            df.loc[:, feat] = df[col1] * df[col2]
-                        else:
-                            df.loc[:, feat] = 0
-                    else:
-                        df.loc[:, feat] = 0
+            # Asegurar que las columnas numéricas existan y sean float, rellenar NaN con 0
+            numeric_cols = ['GDP_per_Capita', 'Social_Support', 'Life_Expectancy', 'Freedom',
+                            'Corruption_Perception', 'Generosity', 'Cluster']
+            for col in numeric_cols:
+                if col not in df.columns:
+                    df[col] = 0
+                df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
 
-            df = df.fillna(0)
+            # Si Cluster no es entero, convertir
+            df['Cluster'] = df['Cluster'].astype(int)
 
-            # Seleccionar solo las columnas que el modelo espera
-            available_features = [f for f in features if f in df.columns]
-            X = df[available_features].copy()
+            # Agregar columnas faltantes con 0 para evitar error al predecir
+            for f in features:
+                if f not in df.columns:
+                    df[f] = 0
 
-            # Añadir columnas faltantes con 0
-            missing_features = [f for f in features if f not in available_features]
-            for mf in missing_features:
-                X[mf] = 0
+            # Reordenar columnas según el orden esperado por el modelo
+            X = df[features].copy()
 
-            # Reordenar columnas
-            X = X[features]
-
+            # Predecir
             prediction = modelo.predict(X)[0]
             print("🔮 Predicción:", prediction)
 
+            # Preparar valores para insertar en DB
             dystopia = data.get("Dystopia_Residual")
             if dystopia is None or (isinstance(dystopia, float) and pd.isna(dystopia)):
                 dystopia = 0.0
@@ -173,7 +153,7 @@ try:
             with conn.cursor() as cursor:
                 cursor.execute(
                     """
-                    INSERT INTO predictions (
+                    INSERT INTO Estimates (
                         region, happiness_score, gdp_per_capita, social_support, life_expectancy, freedom,
                         corruption_perception, generosity, dystopia_residual, cluster, happiness_level,
                         happiness_category, predicted_happiness_score
