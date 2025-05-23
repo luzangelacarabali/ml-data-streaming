@@ -52,23 +52,6 @@ WORKSHOP3/
 
 ---
 
-## Requisitos e Instalación
-
-1. Crear entorno virtual:
-
-```bash
-python -m venv venv
-source venv/bin/activate      # En Windows: venv\Scripts\activate
-```
-
-2. Instalar dependencias:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
 ## Flujo de Trabajo
 
 1. Limpieza y combinación de datos: `01_combine_data.ipynb`
@@ -132,6 +115,21 @@ cd ml-data-streaming
 ```
 
 4. Continúa con los pasos descritos en la sección **Requisitos e Instalación** para preparar el entorno y ejecutar el sistema.
+---
+
+1. Crear entorno virtual:
+
+```bash
+python -m venv venv
+source venv/bin/activate      # En Windows: venv\Scripts\activate
+```
+
+2. Instalar dependencias:
+
+```bash
+pip install -r requirements.txt
+```
+
 ---
 ## Conclusiones Generales
 
