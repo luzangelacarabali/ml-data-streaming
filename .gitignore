@@ -1,4 +1,6 @@
-# Ignorar el entorno virtual (puede variar según el nombre de la carpeta)
-venv/
-.env/
-env/
+# .gitignore
+*.pyc
+__pycache__/
+.venv/
+.env
+
