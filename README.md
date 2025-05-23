@@ -2,12 +2,21 @@
 
 ## Descripción del Proyecto
 
-Este proyecto busca predecir el **Happiness Score** (índice de felicidad) de distintos países usando datos históricos desde 2015 hasta 2019. El flujo completo incluye:
+Este proyecto tiene como objetivo predecir el **Happiness Score** (índice de felicidad) de países a partir de datos históricos de los años 2015 a 2019. Se implementan técnicas de análisis de datos, aprendizaje automático y transmisión de datos en tiempo real utilizando un enfoque modular y escalable.
 
-* Recolección y limpieza de datos
-* Entrenamiento de un modelo de regresión (Random Forest)
-* Transmisión de datos en tiempo real con **Apache Kafka**
-* Orquestación de servicios con **Docker** para facilitar la implementación y despliegue
+Tecnologías utilizadas:
+
+* **Python 3.10**
+* **Jupyter Notebook**
+* **Apache Kafka**
+* **PostgreSQL**
+* **Docker**
+
+---
+
+## Objetivo
+
+Desarrollar un sistema que integre procesamiento de datos, modelado predictivo y almacenamiento en base de datos para estimar el índice de felicidad a partir de variables socioeconómicas.
 
 ---
 
@@ -17,47 +26,44 @@ Este proyecto busca predecir el **Happiness Score** (índice de felicidad) de di
 WORKSHOP3/
 │
 ├── config/
-│   ├── __init__.py
-│   └── conexion_db.py         # Conexión a base de datos PostgreSQL
-│
+│   └── conexion_db.py
 ├── cuaderno/
-│   ├── 01_combine_data.ipynb  # Unión y limpieza de datos
-│   ├── 02_EDA.ipynb           # Análisis exploratorio y visualización
-│   ├── 03_modelo.ipynb        # Entrenamiento y evaluación del modelo
-│   └── 04_db_model.ipynb      # Inserción de predicciones en la base de datos
-│
+│   ├── 01_combine_data.ipynb
+│   ├── 02_EDA.ipynb
+│   ├── 03_modelo.ipynb
+│   └── 04_db_model.ipynb
 ├── datos/
-│   ├── 2015.csv a 2019.csv    # Datos originales por año
-│   ├── combined_happiness_data.csv  # Dataset combinado
-│   └── datos_procesados.csv         # Datos limpios y listos para modelar
-│
+│   ├── 2015.csv - 2019.csv
+│   ├── combined_happiness_data.csv
+│   └── datos_procesados.csv
 ├── kafka/
-│   ├── producer.py            # Productor Kafka que envía datos
-│   └── consumer.py            # Consumidor Kafka que predice y almacena resultados
-│
+│   ├── producer.py
+│   └── consumer.py
 ├── modelo/
-│   └── mejor_modelo.pkl       # Modelo entrenado serializado
-│
-├── pdf/                       # Documentación adicional
-│
-├── .env                       # Variables de entorno sensibles
+│   └── ridge_modelo.pkl
+├── transformación/
+├── pdf/
+├── .env
 ├── .gitignore
-└── docker-compose.yml         # Orquestación de servicios con Docker
+├── requirements.txt
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
 
-## Requerimientos
+## Requisitos e Instalación
 
-Para instalar las dependencias, crea y activa un entorno virtual y luego ejecuta:
+1. Crear entorno virtual:
 
 ```bash
 python -m venv venv
-# En Linux/Mac:
-source venv/bin/activate
-# En Windows (PowerShell):
-venv\Scripts\activate
+source venv/bin/activate      # En Windows: venv\Scripts\activate
+```
 
+2. Instalar dependencias:
+
+```bash
 pip install -r requirements.txt
 ```
 
@@ -65,73 +71,59 @@ pip install -r requirements.txt
 
 ## Flujo de Trabajo
 
-1. **Combinación y limpieza de datos**
-   Ejecuta `cuaderno/01_combine_data.ipynb` para unir y limpiar los datos históricos.
+1. Limpieza y combinación de datos: `01_combine_data.ipynb`
+2. Análisis exploratorio: `02_EDA.ipynb`
+3. Entrenamiento de modelos: `03_modelo.ipynb`
+4. Envío y predicción en tiempo real con Kafka: `producer.py` y `consumer.py`
+5. Almacenamiento en PostgreSQL: `04_db_model.ipynb`
+6. Orquestación de servicios con Docker:
 
-2. **Análisis Exploratorio de Datos (EDA)**
-   Visualiza y analiza variables en `cuaderno/02_EDA.ipynb` para entender mejor los datos.
-
-3. **Entrenamiento del Modelo**
-   Entrena y evalúa modelos de regresión en `cuaderno/03_modelo.ipynb`. El modelo final es un **Random Forest** con R² ≈ 0.89.
-
-4. **Predicción y almacenamiento con Kafka**
-
-   * Ejecuta `kafka/producer.py` para enviar datos procesados al tópico Kafka.
-   * Ejecuta `kafka/consumer.py` para consumir datos, predecir el índice de felicidad y guardar resultados en PostgreSQL.
-
-5. **Orquestación con Docker**
-   Levanta los servicios (Kafka, Zookeeper, PostgreSQL) ejecutando:
-
-   ```bash
-   docker-compose up -d
-   ```
+```bash
+docker-compose up -d
+docker ps
+```
 
 ---
 
-## Cómo usar el proyecto
+## Modelado Predictivo
 
-1. Levanta los servicios con Docker:
+Se evaluaron tres modelos de regresión: **Linear Regression**, **Ridge Regression** y **Random Forest**. A continuación, se presenta un resumen de las métricas evaluadas:
 
-   ```bash
-   docker-compose up -d
-   ```
+| Métrica                             | Linear Regression | Ridge Regression | Random Forest |
+| ----------------------------------- | ----------------- | ---------------- | ------------- |
+| **MSE**                             | 0.0723            | 0.0996           | 0.2033        |
+| **R²**                              | 0.9406            | 0.9181           | 0.8329        |
+| **R² global (cross\_val\_predict)** | 0.8583            | 0.9098           | 0.8295        |
+| **MAE (cross\_val\_predict)**       | 0.2485            | 0.2559           | 0.3541        |
+| **R² promedio (cross\_val\_score)** | 0.8527            | 0.9087           | 0.8258        |
+| **Desv. estándar R²**               | 0.0598            | 0.0092           | 0.0295        |
 
-2. Verifica que los servicios estén activos:
-
-   ```bash
-   docker ps
-   ```
-
-3. Ejecuta el productor Kafka para enviar datos:
-
-   ```bash
-   python kafka/producer.py
-   ```
-
-4. Ejecuta el consumidor Kafka para predecir y guardar en base de datos:
-
-   ```bash
-   python kafka/consumer.py
-   ```
+**Modelo seleccionado:** *Ridge Regression* fue el modelo elegido gracias a su alto desempeño en precisión y estabilidad (R² = 0.9181), con baja desviación estándar, lo que demuestra consistencia entre diferentes subconjuntos de datos.
 
 ---
 
 ## Base de Datos
 
-* Sistema: **PostgreSQL**
-* Tabla para almacenar:
+* Motor: **PostgreSQL**
+* Librería de conexión: `psycopg2`
+* Conexión gestionada en: `config/conexion_db.py`
+Se almacenan:
+* Predicciones del Happiness Score
 
-  * Variables de entrada
-  * Predicción del Happiness Score
-  * Fecha y hora de la predicción
-* La conexión está gestionada en `config/conexion_db.py` usando la librería `psycopg2`
+
+---
+
+## Conclusiones Generales
+
+* El modelo Ridge mostró alta precisión y generalización, ideal para este tipo de predicción.
+* La limpieza de datos y análisis previo fueron clave para obtener un dataset robusto.
+* La arquitectura con Kafka y Docker permite procesamiento en tiempo real y escalabilidad.
+* Este enfoque puede escalarse o adaptarse a otras métricas sociales o económicas, sirviendo como herramienta para análisis de bienestar a gran escala.
 
 ---
 
 ## Contacto
 
-* **Autor:** luzangelacarabali
-* (Puedes agregar aquí tu correo, LinkedIn u otra forma de contacto si quieres)
-
----
+* **GitHub:** [@luzangelacarabali](https://github.com/luzangelacarabali)
+* **LinkedIn:** [Luz Ángela Carabalí](https://www.linkedin.com/in/luz-angela-carabali-mulato-12b561306?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app)
 
