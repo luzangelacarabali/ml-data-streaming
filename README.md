@@ -21,6 +21,8 @@ Desarrollar un sistema que integre procesamiento de datos, modelado predictivo y
 ---
 
 ## Estructura del Proyecto
+![image](https://github.com/user-attachments/assets/45e0d33a-c116-41ae-b841-ca5fa19913ed)
+
 
 ```
 WORKSHOP3/
