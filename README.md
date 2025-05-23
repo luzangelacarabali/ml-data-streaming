@@ -1,3 +1,7 @@
+Perfecto. Aquí tienes el `README.md` con la sección de **clonar el repositorio** ubicada al final, incluyendo el paso a paso y el enlace correcto a tu repositorio de GitHub:
+
+---
+
 # Predicción del Happiness Score por País (2015-2019)
 
 ## Descripción del Proyecto
@@ -99,6 +103,7 @@ Se evaluaron tres modelos de regresión: **Linear Regression**, **Ridge Regressi
 | **Desv. estándar R²**               | 0.0598            | 0.0092           | 0.0295        |
 
 **Modelo seleccionado:** *Ridge Regression* fue el modelo elegido gracias a su alto desempeño en precisión y estabilidad (R² = 0.9181), con baja desviación estándar, lo que demuestra consistencia entre diferentes subconjuntos de datos.
+
 ![image](https://github.com/user-attachments/assets/689ca11e-0c8f-4c85-8c2f-c3de099d7fb4)
 
 ---
@@ -108,13 +113,30 @@ Se evaluaron tres modelos de regresión: **Linear Regression**, **Ridge Regressi
 * Motor: **PostgreSQL**
 * Librería de conexión: `psycopg2`
 * Conexión gestionada en: `config/conexion_db.py`
+
 ![image](https://github.com/user-attachments/assets/74eb444d-d638-4378-b09b-eabda0d3d25d)
-
-  
-
 
 ---
 
+##  ¿Cómo clonar el repositorio?
+
+Sigue estos pasos para clonar y ejecutar el proyecto en tu entorno local:
+
+1. Abre tu terminal o consola de comandos.
+2. Clona el repositorio desde GitHub:
+
+```bash
+git clone https://github.com/luzangelacarabali/ml-data-streaming.git
+```
+
+3. Accede a la carpeta del proyecto:
+
+```bash
+cd ml-data-streaming
+```
+
+4. Continúa con los pasos descritos en la sección **Requisitos e Instalación** para preparar el entorno y ejecutar el sistema.
+---
 ## Conclusiones Generales
 
 * El modelo Ridge mostró alta precisión y generalización, ideal para este tipo de predicción.
