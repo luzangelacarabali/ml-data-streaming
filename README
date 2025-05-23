@@ -1,10 +1,17 @@
+¡Claro! Aquí tienes tu README organizado y un poco más claro, con secciones bien definidas y con formato profesional. He añadido algunos detalles para mejorar la legibilidad y fluidez:
 
+---
 
 # Predicción del Happiness Score por País (2015-2019)
 
 ## Descripción del Proyecto
 
-Este proyecto tiene como objetivo predecir el **Happiness Score** (índice de felicidad) de diferentes países utilizando datos históricos desde 2015 hasta 2019. El flujo completo incluye la recolección y limpieza de datos, el entrenamiento de un modelo de regresión, la transmisión de datos en tiempo real mediante **Apache Kafka**, y la orquestación de servicios con **Docker** para facilitar la implementación.
+Este proyecto busca predecir el **Happiness Score** (índice de felicidad) de distintos países usando datos históricos desde 2015 hasta 2019. El flujo completo incluye:
+
+* Recolección y limpieza de datos
+* Entrenamiento de un modelo de regresión (Random Forest)
+* Transmisión de datos en tiempo real con **Apache Kafka**
+* Orquestación de servicios con **Docker** para facilitar la implementación y despliegue
 
 ---
 
@@ -15,7 +22,7 @@ WORKSHOP3/
 │
 ├── config/
 │   ├── __init__.py
-│   └── conexion_db.py         # Conexión a la base de datos PostgreSQL
+│   └── conexion_db.py         # Conexión a base de datos PostgreSQL
 │
 ├── cuaderno/
 │   ├── 01_combine_data.ipynb  # Unión y limpieza de datos
@@ -35,7 +42,7 @@ WORKSHOP3/
 ├── modelo/
 │   └── mejor_modelo.pkl       # Modelo entrenado serializado
 │
-├── pdf/                       # Documentación extra
+├── pdf/                       # Documentación adicional
 │
 ├── .env                       # Variables de entorno sensibles
 ├── .gitignore
@@ -46,11 +53,15 @@ WORKSHOP3/
 
 ## Requerimientos
 
-Para instalar las dependencias del proyecto, crea y activa un entorno virtual y luego ejecuta:
+Para instalar las dependencias, crea y activa un entorno virtual y luego ejecuta:
 
 ```bash
 python -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
+# En Linux/Mac:
+source venv/bin/activate
+# En Windows (PowerShell):
+venv\Scripts\activate
+
 pip install -r requirements.txt
 ```
 
@@ -59,22 +70,21 @@ pip install -r requirements.txt
 ## Flujo de Trabajo
 
 1. **Combinación y limpieza de datos**
-   Ejecutar `cuaderno/01_combine_data.ipynb` para unir y limpiar los datos históricos.
+   Ejecuta `cuaderno/01_combine_data.ipynb` para unir y limpiar los datos históricos.
 
-2. **Análisis Exploratorio (EDA)**
-   Realizar visualizaciones y análisis en `cuaderno/02_EDA.ipynb` para entender las variables.
+2. **Análisis Exploratorio de Datos (EDA)**
+   Visualiza y analiza variables en `cuaderno/02_EDA.ipynb` para entender mejor los datos.
 
 3. **Entrenamiento del Modelo**
-   Entrenar y evaluar diferentes modelos de regresión en `cuaderno/03_modelo.ipynb`. El modelo final es un **Random Forest** con un R² ≈ 0.89.
+   Entrena y evalúa modelos de regresión en `cuaderno/03_modelo.ipynb`. El modelo final es un **Random Forest** con R² ≈ 0.89.
 
-4. **Predicción y almacenamiento**
-   Utilizar Kafka para transmitir datos en tiempo real:
+4. **Predicción y almacenamiento con Kafka**
 
-   * Ejecutar `kafka/producer.py` para enviar datos procesados.
-   * Ejecutar `kafka/consumer.py` para recibir datos, predecir felicidad y guardar resultados en PostgreSQL.
+   * Ejecuta `kafka/producer.py` para enviar datos procesados al tópico Kafka.
+   * Ejecuta `kafka/consumer.py` para consumir datos, predecir el índice de felicidad y guardar resultados en PostgreSQL.
 
 5. **Orquestación con Docker**
-   Levantar los servicios (Kafka, Zookeeper, PostgreSQL) con:
+   Levanta los servicios (Kafka, Zookeeper, PostgreSQL) ejecutando:
 
    ```bash
    docker-compose up -d
@@ -84,25 +94,25 @@ pip install -r requirements.txt
 
 ## Cómo usar el proyecto
 
-1. **Levantar los servicios con Docker**:
+1. Levanta los servicios con Docker:
 
    ```bash
    docker-compose up -d
    ```
 
-2. **Verificar que los servicios estén activos**:
+2. Verifica que los servicios estén activos:
 
    ```bash
    docker ps
    ```
 
-3. **Ejecutar el productor Kafka (envía datos al tópico)**:
+3. Ejecuta el productor Kafka para enviar datos:
 
    ```bash
    python kafka/producer.py
    ```
 
-4. **Ejecutar el consumidor Kafka (predice y guarda en BD)**:
+4. Ejecuta el consumidor Kafka para predecir y guardar en base de datos:
 
    ```bash
    python kafka/consumer.py
@@ -118,9 +128,12 @@ pip install -r requirements.txt
   * Variables de entrada
   * Predicción del Happiness Score
   * Fecha y hora de la predicción
-* Conexión gestionada en `config/conexion_db.py` usando `psycopg2`
+* La conexión está gestionada en `config/conexion_db.py` usando la librería `psycopg2`
 
 ---
 
 ## Contacto
+
+* **Autor:** luzangelacarabali
+* (Puedes agregar aquí tu correo, LinkedIn u otra forma de contacto si quieres)
 
