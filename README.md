@@ -131,7 +131,7 @@ pip install -r requirements.txt
 ```
 
 ---
-## Conclusiones Generales
+## Conclusiones 
 
 * El modelo Ridge mostró alta precisión y generalización, ideal para este tipo de predicción.
 * La limpieza de datos y análisis previo fueron clave para obtener un dataset robusto.
