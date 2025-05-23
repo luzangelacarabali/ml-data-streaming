@@ -1,7 +1,3 @@
-Perfecto. Aquí tienes el `README.md` con la sección de **clonar el repositorio** ubicada al final, incluyendo el paso a paso y el enlace correcto a tu repositorio de GitHub:
-
----
-
 # Predicción del Happiness Score por País (2015-2019)
 
 ## Descripción del Proyecto
